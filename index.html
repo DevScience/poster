@@ -21,7 +21,7 @@
 		
 		/* Clase para el banner del encabezado */
 		.hero-banner {
-			background-image: url('https://raw.githubusercontent.com/DevScience/poster/refs/heads/main/coinsi2025.png');
+			background-image: url('https://raw.githubusercontent.com/DevScience/posters/refs/heads/main/coinsi2025.png');
 			background-size: cover;
 			background-position: center center;
 		}
@@ -53,9 +53,10 @@
 	<!-- Contenido Principal -->
 	<div class="container mx-auto px-6 py-12">
 		
-		<!-- Buscador -->
-		<div class="mb-16">
-			<div class="relative max-w-2xl mx-auto group">
+		<!-- Buscador y Contador -->
+		<div class="mb-16 flex flex-col md:flex-row justify-center items-center gap-4 max-w-4xl mx-auto">
+			<!-- Caja del Buscador -->
+			<div class="relative w-full flex-grow group">
 				<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
 					<svg class="w-5 h-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 				</div>
@@ -65,6 +66,17 @@
 					placeholder="Buscar por título, autor o palabras clave..."
 					class="w-full pl-12 p-4 border border-slate-200 rounded-full shadow-sm focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-300 text-lg bg-white placeholder-slate-400"
 				/>
+			</div>
+
+			<!-- Contador de Visitas -->
+			<div class="flex items-center gap-3 bg-white border border-slate-200 rounded-full px-6 py-3 shadow-sm md:w-auto w-full justify-center">
+				<div class="bg-indigo-100 p-1.5 rounded-full">
+					<svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+				</div>
+				<div class="flex flex-col leading-none">
+					<span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Visitas</span>
+					<span id="visit-count" class="text-xl font-bold text-slate-700 tabular-nums">...</span>
+				</div>
 			</div>
 		</div>
 
@@ -136,13 +148,57 @@
 
 	<!-- Footer -->
 	<footer class="bg-white text-slate-500 text-center py-10 mt-12 border-t border-slate-200">
-		<p class="text-sm font-medium">&copy; 2025 COINSI. Congreso Internacional de Ingeniería de Sistemas - UNA Puno</p>
+		<p class="text-sm font-medium">&copy; 2025 COINSI. Innovación y Ciencia.</p>
 	</footer>
 
 	<script>
+		// --- Lógica del Contador de Visitas ---
+		(function initCounter() {
+			const countEl = document.getElementById('visit-count');
+			// Clave para guardar en el navegador
+			const STORAGE_KEY = 'coinsi_gallery_visits';
+			// Valor inicial solicitado
+			const INITIAL_COUNT = 0;
+			
+			// Obtener valor actual o null si es la primera vez
+			let currentCount = localStorage.getItem(STORAGE_KEY);
+			
+			if (!currentCount) {
+				// Primera visita (o almacenamiento limpio): Iniciar en 33
+				currentCount = INITIAL_COUNT;
+			} else {
+				// Visitas subsecuentes: Incrementar
+				currentCount = parseInt(currentCount) + 1;
+			}
+			
+			// Guardar y mostrar
+			localStorage.setItem(STORAGE_KEY, currentCount);
+			
+			// Animación simple de conteo
+			let start = Math.max(0, currentCount - 20);
+			const duration = 1000;
+			const startTime = performance.now();
+			
+			function update(currentTime) {
+				const elapsed = currentTime - startTime;
+				const progress = Math.min(elapsed / duration, 1);
+				
+				// Easing easeOutQuart
+				const ease = 1 - Math.pow(1 - progress, 4);
+				
+				const val = Math.floor(start + (currentCount - start) * ease);
+				countEl.textContent = val.toLocaleString();
+				
+				if (progress < 1) {
+					requestAnimationFrame(update);
+				} else {
+					countEl.textContent = currentCount.toLocaleString();
+				}
+			}
+			requestAnimationFrame(update);
+		})();
+
 		// --- Paletas de Color UX Modernas ---
-		// Hex: Color sólido para la imagen del placeholder
-		// Tailwind classes: Clases para el estilo de la tarjeta
 		const modernPalettes = [
 			{ name: 'Indigo',   hex: '6366f1', bg: 'bg-indigo-50/50',   border: 'border-indigo-100', text: 'text-indigo-900', accent: 'text-indigo-600', badge: 'bg-indigo-100 text-indigo-700' },
 			{ name: 'Emerald',  hex: '10b981', bg: 'bg-emerald-50/50',  border: 'border-emerald-100', text: 'text-emerald-900', accent: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700' },
@@ -156,7 +212,7 @@
 
 		// --- Datos ---
 		const rawPosters = [
-			// --- TERMINADOS (10) ---
+			// --- TERMINADOS (13) ---
 			{
 				titulo: "COMPARACIÓN Y APLICACIÓN DE MODELOS DE INTELIGENCIA ARTIFICIAL PARA LA DETECCIÓN DE URLS DE PHISHING EN UNA EXTENSIÓN WEB",
 				autor: "Ivan Condori; Christian Ticona; Rosario Bustamante",
@@ -182,11 +238,35 @@
 				categoria: 'terminado'
 			},
 			{
+				titulo: "ANÁLISIS COMPARATIVO DEL PERCEPTRÓN MULTICAPA Y REDES NEURONALES CONVOLUCIONALES PARA LA DETECCIÓN DE INTRUSIONES EN REDES DE ÁREA LOCAL: CASO DE ESTUDIO OTI – UNAP",
+				autor: "Rigoberto Aquisi Accha; Marga I. Ingaluque Arapa",
+				imagenUrl: "https://placehold.co/400x600?text=Póster+Id11",
+				pdfUrl: "https://drive.google.com/file/d/11j803Oq_9Nxun8Gjg_Y3eE_X1Ind41J0/view",
+				videoUrl: "#",
+				categoria: 'terminado'
+			},
+			{
+				titulo: "SISTEMA DE RECONOCIMIENTO FACIAL PARA LA MEJORA DE LA SEGURIDAD EN LA VIGILANCIA DE LA I.E.S. POLITÉCNICO REGIONAL LOS ANDES DE JULIACA",
+				autor: "Lizbeth C. Apaza Quispe; Marga I. Ingaluque Arapa",
+				imagenUrl: "https://placehold.co/400x600?text=Póster+Id12",
+				pdfUrl: "https://drive.google.com/file/d/17EsQcFk_sOGl4aFdfaFSi2wjplElRB-n/view",
+				videoUrl: "#",
+				categoria: 'terminado'
+			},
+			{
 				titulo: "CLASIFICACIÓN AUTOMATIZADA DE LESIONES CUTÁNEAS MEDIANTE MOBILENETV2 CON TRANSFER LEARNING PARA APOYO EN DEMATOLOGÍA",
 				autor: "Jhon M. Aracayo Mamani; Juan D. Canaza Paucara; Mayenka Fernandez Chambi",
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id13",
 				pdfUrl: "https://drive.google.com/file/d/1XyEZp0b5ZYo4cHsoiAxf-nWv7VHyleh0/view",
 				videoUrl: "https://drive.google.com/file/d/1CA1_uF_vCI1GBAxh1UAuygwX_LZ5gQgA/view",
+				categoria: 'terminado'
+			},
+			{
+				titulo: "PLATAFORMA EDUCATIVA GAMIFICADA CON ANÁLISIS INTELIGENTE DE DECISIONES E IA ADAPTATIVA PARA FORTALECER COMPETENCIAS EN CIBERSEGURIDAD",
+				autor: "Eder W. Sanca Halanoca; Hernan Zapata Luque; Rogger Humpiri Flores",
+				imagenUrl: "https://placehold.co/400x600?text=Póster+Id14",
+				pdfUrl: "https://drive.google.com/file/d/1Jc1HuCrNlea4GYGSXJqXxi3LXDcz0Yif/view",
+				videoUrl: "#",
 				categoria: 'terminado'
 			},
 			{
@@ -326,8 +406,11 @@
 			// Asignar tema aleatorio
 			const theme = modernPalettes[Math.floor(Math.random() * modernPalettes.length)];
 			
+			// Modificar la URL del placeholder para usar el color Hex del tema
+			// Así la imagen coincide con el borde de la tarjeta
 			let dynamicImage = poster.imagenUrl;
 			if (dynamicImage.includes('placehold.co')) {
+				// Si la URL ya tiene parámetros (ej ?text=...), los conservamos para no perder "Póster IdXX"
 				const parts = dynamicImage.split('?');
 				const baseUrl = parts[0];
 				const query = parts[1] ? `?${parts[1]}` : '';
@@ -530,5 +613,4 @@
 		renderPosters();
 	</script>
 </body>
-
 </html>
