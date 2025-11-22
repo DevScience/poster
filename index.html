@@ -133,11 +133,11 @@
 	<div id="zerg-hud">
 		<div class="text-lg font-extrabold text-red-500 mb-3 border-b border-slate-600 pb-2 flex justify-between items-center">
 			ZERG RUSH
-			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">TURBO</span>
+			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">OMNI</span>
 		</div>
 		<div class="hud-stat text-slate-300"><span>Puntos:</span> <span id="score-val" class="text-emerald-400 font-bold font-mono">0</span></div>
 		<div class="hud-stat text-slate-300"><span>Nivel:</span> <span id="level-val" class="text-amber-400 font-bold font-mono">1</span></div>
-		<div class="hud-stat text-slate-300"><span>Enjambre:</span> <span id="count-val" class="text-white font-mono">0</span>/<span id="max-zerg-val">33</span></div>
+		<div class="hud-stat text-slate-300"><span>Enjambre:</span> <span id="count-val" class="text-white font-mono">0</span>/<span id="max-zerg-val">18</span></div>
 		
 		<div class="mt-4 pt-3 border-t border-slate-600">
 			<div class="text-[10px] text-slate-400 mb-2 uppercase tracking-wider font-semibold text-center">Misión: Sobrevivir</div>
@@ -639,10 +639,10 @@
 		renderPosters();
 
 		// =================================================
-		// === LOGICA DEL ZERG RUSH OPTIMIZADA (GAME) ===
+		// === LOGICA DEL ZERG RUSH OMNI (GAME) ===
 		// =================================================
 		
-		const MAX_ZERGLINGS = 33; // Límite de población ajustado
+		const MAX_ZERGLINGS = 18; // Límite de población para OMNI (reducido pero dinámico)
 		let zerglings = [];
 		let targets = [];
 		let gameInterval;
@@ -656,9 +656,9 @@
 		let gameEnded = false;
 		let level = 1;
 		
-		// Variables de dificultad dinámica (TURBO)
-		let spawnRate = 400; // Spawn inicial muy rápido
-		let zergSpeedBase = 5; // Velocidad inicial rápida
+		// Variables de dificultad dinámica
+		let spawnRate = 400; // Rapido spawn inicial
+		let zergSpeedBase = 5; // Velocidad rápida inicial
 		let zergHpChance = 0;
 
 		// Footer Target Reference
@@ -678,7 +678,7 @@
 			gameActive = true;
 			gameEnded = false;
 			
-			// Reiniciar variables de dificultad
+			// Reiniciar variables
 			level = 1;
 			spawnRate = 400;
 			zergSpeedBase = 5;
@@ -700,7 +700,7 @@
 			const elements = document.querySelectorAll('.target-element');
 			elements.forEach(el => {
 				if(el.offsetParent !== null) {
-					// Restaurar visibilidad y opacidad de elementos anteriores
+					// Restaurar visibilidad y opacidad
 					el.style.visibility = 'visible';
 					el.style.opacity = 1;
 					
@@ -708,7 +708,6 @@
 					const t = {
 						el: el,
 						rect: el.getBoundingClientRect(),
-						// Footer tiene vida de jefe
 						hp: isFooter ? 300 : 100, 
 						originalOpacity: el.style.opacity || 1,
 						isFooter: isFooter
@@ -718,7 +717,7 @@
 				}
 			});
 
-			// Loop principal (30ms = ~33 FPS fluido)
+			// Loop principal (30ms)
 			if (gameInterval) clearInterval(gameInterval);
 			gameInterval = setInterval(updateGame, 30);
 			
@@ -730,7 +729,6 @@
 			if (difficultyTimer) clearInterval(difficultyTimer);
 			difficultyTimer = setInterval(increaseDifficulty, 5000);
 			
-			// Scroll al top para ver la acción
 			window.scrollTo({ top: 0, behavior: 'smooth' });
 		}
 
@@ -739,10 +737,9 @@
 			level++;
 			document.getElementById('level-val').textContent = level;
 
-			// Escalado agresivo (+1 velocidad)
+			// Más rápidos (+1)
 			if (zergSpeedBase < 15) zergSpeedBase += 1;
 			
-			// Cap de spawn rate para no saturar
 			if (spawnRate > 200) spawnRate -= 50;
 			
 			if (level > 2 && zergHpChance < 0.8) zergHpChance += 0.05;
@@ -759,7 +756,6 @@
 		}
 
 		function spawnZergling() {
-			// LÍMITE DE POBLACIÓN estricto
 			if (zerglings.length >= MAX_ZERGLINGS) {
 				document.getElementById('count-val').style.color = 'red';
 				return; 
@@ -788,8 +784,32 @@
 			zerg.style.width = size + 'px';
 			zerg.style.height = size + 'px';
 			
-			const startX = Math.random() * (window.innerWidth - 30);
-			const startY = window.scrollY - 50;
+			// --- SPAWN OMNIDIRECCIONAL ---
+			let startX, startY;
+            const edge = Math.floor(Math.random() * 4); // 0: Top, 1: Right, 2: Bottom, 3: Left
+            const offset = 60;
+            const vWidth = window.innerWidth;
+            const vHeight = window.innerHeight;
+            const scrollY = window.scrollY;
+
+            switch(edge) {
+                case 0: // Top
+                    startX = Math.random() * vWidth;
+                    startY = scrollY - offset;
+                    break;
+                case 1: // Right
+                    startX = vWidth + offset;
+                    startY = scrollY + (Math.random() * vHeight);
+                    break;
+                case 2: // Bottom
+                    startX = Math.random() * vWidth;
+                    startY = scrollY + vHeight + offset;
+                    break;
+                case 3: // Left
+                    startX = -offset;
+                    startY = scrollY + (Math.random() * vHeight);
+                    break;
+            }
 			
 			zerg.style.left = startX + 'px';
 			zerg.style.top = startY + 'px';
@@ -798,7 +818,7 @@
 				el: zerg,
 				x: startX,
 				y: startY,
-				speed: zergSpeedBase + (Math.random() * 2), // Variación de velocidad
+				speed: zergSpeedBase + (Math.random() * 2), 
 				target: null,
 				hp: maxHp,
 				maxHp: maxHp,
@@ -971,22 +991,24 @@
 			targets = targets.filter(t => t.hp > 0);
 
 			zerglings.forEach((enemy, index) => {
-				if (enemy.y > document.body.scrollHeight + 100) {
-					enemy.el.remove();
-					zerglings.splice(index, 1);
-					return;
+				// Limpieza si se salen muy lejos
+				if (enemy.y > document.body.scrollHeight + 500 || enemy.y < -500 || enemy.x < -500 || enemy.x > window.innerWidth + 500) {
+					// Solo eliminar si no tienen target y están lejos
+					if(!enemy.target) {
+						enemy.el.remove();
+						zerglings.splice(index, 1);
+						return;
+					}
 				}
 
 				if (!enemy.target || enemy.target.hp <= 0) {
 					let minDist = Infinity;
 					let closest = null;
 					
-					// --- LÓGICA SECUENCIAL ESTRICTA ---
-					// Verificar si queda algo VIVO que NO sea el Footer
+					// SECUENCIAL ESTRICTO: Footer solo si no hay nada más
 					const hasNonFooterTargets = targets.some(t => !t.isFooter && t.hp > 0);
 					
 					targets.forEach(t => {
-						// Si quedan objetivos normales, el footer es INVISIBLE para ellos
 						if (hasNonFooterTargets && t.isFooter) return;
 
 						const rect = t.el.getBoundingClientRect();
@@ -1034,7 +1056,10 @@
 						}
 					}
 				} else {
-					enemy.y += enemy.speed;
+					// Si no hay targets (ej. ganaron pero footer muriendo), se mueven al centro
+					enemy.x += (window.innerWidth/2 - enemy.x) * 0.01;
+					enemy.y += (window.scrollY + window.innerHeight/2 - enemy.y) * 0.01;
+					enemy.el.style.left = enemy.x + 'px';
 					enemy.el.style.top = enemy.y + 'px';
 				}
 			});
