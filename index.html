@@ -881,15 +881,17 @@
             let letterSpacing = 110;
             let zergSize = '12px';
 
-            if (screenW < 768) {
-                gap = 7;
-                letterSpacing = 55;
-                zergSize = '6px';
+            if (screenW < 800) {
+                const safeWidth = screenW * 0.9;
+                letterSpacing = safeWidth / 6; 
+                gap = letterSpacing / 5; 
+                zergSize = Math.max(4, gap * 0.8) + 'px';
             }
 
-            const totalWidth = (5 * letterSpacing) + (4 * gap); 
+            const totalWidth = (5 * letterSpacing) + (2 * gap); 
+            
 			const startX = (screenW - totalWidth) / 2;
-			const startY = centerY - 50;
+			const startY = centerY - (3 * gap);
 
             zerglings.sort(() => Math.random() - 0.5);
 
