@@ -60,9 +60,15 @@
 			color: rgba(255,255,255,0.9);
 			user-select: none;
 			border: 2px solid white;
-			/* Transiciones optimizadas */
-			transition: transform 0.05s, opacity 0.1s, background-color 1.5s ease, width 0.5s ease, height 0.5s ease, left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
+			/* OPTIMIZACIÓN CRÍTICA: Quitamos left/top de la transición por defecto para evitar LAG */
+			transition: transform 0.05s, opacity 0.1s, background-color 0.5s ease, width 0.5s ease, height 0.5s ease;
 		}
+		
+		/* Clase especial que se añade SOLO al final para que se muevan suavemente a formar el texto */
+		.zergling.formation {
+			transition: left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 1s ease, width 1s ease, height 1s ease;
+		}
+
 		.zergling.type-y { background-color: #fbbc05; }
 		.zergling.type-r { background-color: #ea4335; }
 		.zergling.type-tank { background-color: #a105fb; border-color: #ffd700; }
@@ -109,9 +115,9 @@
 			opacity: 0;
 			transition: opacity 2s ease-in-out;
 			pointer-events: none;
-			background: rgba(255, 255, 255, 0.9); /* Fondo más sólido para limpieza visual */
+			background: rgba(255, 255, 255, 0.92); /* Fondo sólido limpio */
 			backdrop-filter: blur(8px);
-			padding-top: 150px; /* EMPUJA EL TEXTO HACIA ABAJO PARA DEJAR ESPACIO A LOS CIRCULOS */
+			padding-top: 180px; /* Espacio superior reservado para la palabra COINSI */
 		}
 		/* Animación de entrada suave para el texto final */
 		.end-text-anim {
@@ -657,9 +663,9 @@
 		let level = 1;
 		
 		// Variables de dificultad dinámica
-		let spawnRate = 300; 
-		let zergSpeedBase = 7; // Faster
-		let zergHpChance = 0;
+		let spawnRate = 600; // Un poco más lento spawn porque son élites
+		let zergSpeedBase = 3; // Velocidad base controlada (se ve rápido porque loop es 30ms)
+		let zergHpChance = 0.1;
 
 		// Footer Target Reference
 		let footerTarget = null;
@@ -680,9 +686,9 @@
 			
 			// Reiniciar variables
 			level = 1;
-			spawnRate = 300;
-			zergSpeedBase = 7;
-			zergHpChance = 0.1; // Start with chance of tanks
+			spawnRate = 600;
+			zergSpeedBase = 3;
+			zergHpChance = 0.1; 
 			score = 0;
 			destroyed = 0;
 			zerglings.forEach(z => z.el.remove());
@@ -737,12 +743,12 @@
 			level++;
 			document.getElementById('level-val').textContent = level;
 
-			// Más rápidos (+1)
-			if (zergSpeedBase < 20) zergSpeedBase += 1;
+			// Más rápidos
+			if (zergSpeedBase < 12) zergSpeedBase += 0.5;
 			
-			if (spawnRate > 100) spawnRate -= 30;
+			if (spawnRate > 200) spawnRate -= 50;
 			
-			if (level > 1 && zergHpChance < 0.8) zergHpChance += 0.08;
+			if (level > 1 && zergHpChance < 0.8) zergHpChance += 0.1;
 
 			const hud = document.getElementById('zerg-hud');
 			hud.style.borderColor = '#ef4444';
@@ -766,18 +772,14 @@
 			const zerg = document.createElement('div');
 			
 			let type = Math.random() > 0.5 ? 'type-r' : 'type-y';
-			let maxHp = 3; // Base HP harder
+			let maxHp = 3; // Base 3 clicks
 			let size = 20;
-
-			let baseHp = level > 3 ? 4 : 3;
 
 			if (Math.random() < zergHpChance) {
 				type = 'type-tank';
-				maxHp = Math.min(12, Math.floor(level) + 5); // Much tougher
-				size = 25 + (maxHp * 2);
+				maxHp = 8 + Math.floor(level); // Tanks son muy duros (8+)
+				size = 30 + (maxHp); // Más grandes
 				zerg.style.zIndex = 10000;
-			} else {
-				maxHp = baseHp;
 			}
 
 			zerg.className = `zergling ${type}`;
@@ -818,7 +820,7 @@
 				el: zerg,
 				x: startX,
 				y: startY,
-				speed: zergSpeedBase + (Math.random() * 3), 
+				speed: zergSpeedBase + (Math.random() * 1.5), 
 				target: null,
 				hp: maxHp,
 				maxHp: maxHp,
@@ -846,13 +848,13 @@
 				if (index > -1) {
 					enemyData.el.remove();
 					zerglings.splice(index, 1);
-					score += (10 * enemyData.maxHp);
+					score += (50 * enemyData.maxHp); // Más puntos por enemigos duros
 					document.getElementById('score-val').textContent = score;
 					document.getElementById('count-val').textContent = zerglings.length;
 				}
 			} else {
 				const currentSize = parseInt(enemyData.el.style.width);
-				const newSize = currentSize * 0.9;
+				const newSize = currentSize * 0.92;
 				enemyData.el.style.width = newSize + 'px';
 				enemyData.el.style.height = newSize + 'px';
 			}
@@ -875,7 +877,12 @@
 		function assignFinalPositions() {
 			const screenW = window.innerWidth;
 			const screenH = window.innerHeight;
-			const centerY = window.scrollY + (window.innerHeight / 2);
+			
+			// --- LÓGICA DE FORMACIÓN CENTRADA ---
+			// Calculamos el centro de la pantalla (independiente del scroll) para el overlay fijo
+			// Pero los zerglings son absolute, así que usamos coordenadas de página relativas al scroll actual
+            const scrollY = window.scrollY;
+			const centerY = scrollY + (window.innerHeight / 2);
 			
             let gap = 14;
             let letterSpacing = 110;
@@ -888,13 +895,17 @@
                 zergSize = Math.max(4, gap * 0.8) + 'px';
             }
 
+            // Ancho total estimado del grupo de letras
             const totalWidth = (5 * letterSpacing) + (2 * gap); 
             
 			const startX = (screenW - totalWidth) / 2;
 			
-            // === POSICIONAMIENTO CLAVE: ARRIBA DEL TEXTO ===
-            // Movemos el startY mucho más arriba del centro para dejar espacio al mensaje
-            const startY = centerY - 180; 
+            // === POSICIONAMIENTO CRÍTICO: ARRIBA DEL TEXTO ===
+            // El texto tiene un padding-top de 180px. Ponemos los círculos en ese espacio superior.
+            // window.innerHeight / 2 es el centro. Subimos -100px o más.
+            // Ajuste responsivo vertical
+            const verticalOffset = screenW < 800 ? 120 : 150;
+            const startY = centerY - verticalOffset; 
 
             zerglings.sort(() => Math.random() - 0.5);
 
@@ -930,6 +941,7 @@
 						z.el.style.borderColor = 'white';
                         z.el.style.opacity = 1;
 						z.el.classList.remove('type-y', 'type-r', 'type-tank');
+						z.el.classList.add('formation'); // Activar transición suave
                         z.el.style.width = zergSize;
                         z.el.style.height = zergSize;
 						
@@ -943,13 +955,14 @@
 				const radius = Math.max(screenW, screenH);
 				zerglings[i].finalTargetX = (screenW/2) + Math.cos(angle) * radius;
 				zerglings[i].finalTargetY = centerY + Math.sin(angle) * radius;
+				zerglings[i].el.classList.add('formation');
 				zerglings[i].el.style.opacity = 0;
 			}
 		}
 
         function spawnVisualZergling(sw, sh, size) {
             const zerg = document.createElement('div');
-            zerg.className = 'zergling';
+            zerg.className = 'zergling formation'; // Ya nace listo para formarse
             zerg.style.width = size;
             zerg.style.height = size;
 			
@@ -957,10 +970,11 @@
             zerg.style.backgroundColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
             zerg.style.borderColor = 'white';
             
+            // Aparecen desde fuera
             const angle = Math.random() * Math.PI * 2;
             const r = Math.max(sw, sh);
             const sx = (sw/2) + Math.cos(angle) * r;
-            const sy = sh + Math.sin(angle) * r;
+            const sy = window.scrollY + (window.innerHeight/2) + Math.sin(angle) * r;
 
             zerg.style.left = sx + 'px';
             zerg.style.top = sy + 'px';
@@ -980,14 +994,14 @@
 
 		function updateGame() {
 			if (gameEnded) {
+				// En modo formación, usamos las transiciones CSS (clase .formation), 
+				// pero necesitamos setear las coordenadas JS una última vez para que el CSS tome el control
+				// O simplemente actualizar las props de estilo en el bucle para los nuevos
 				zerglings.forEach(enemy => {
 					if (enemy.finalTargetX !== null) {
-						const dx = enemy.finalTargetX - enemy.x;
-						const dy = enemy.finalTargetY - enemy.y;
-						enemy.x += dx * 0.08; 
-						enemy.y += dy * 0.08;
-						enemy.el.style.left = enemy.x + 'px';
-						enemy.el.style.top = enemy.y + 'px';
+						// Aplicamos coordenadas finales directas y dejamos que CSS transition haga la magia
+						enemy.el.style.left = enemy.finalTargetX + 'px';
+						enemy.el.style.top = enemy.finalTargetY + 'px';
 					}
 				});
 				return;
@@ -1009,7 +1023,7 @@
 					let minDist = Infinity;
 					let closest = null;
 					
-					// SECUENCIAL ESTRICTO: Footer solo si no hay nada más
+					// SECUENCIAL ESTRICTO
 					const hasNonFooterTargets = targets.some(t => !t.isFooter && t.hp > 0);
 					
 					targets.forEach(t => {
@@ -1043,7 +1057,7 @@
 					const dist = Math.hypot(targetX - enemy.x, targetY - enemy.y);
 					
 					if (dist < 50) { 
-						enemy.target.hp -= 2; 
+						enemy.target.hp -= 5; // Daño aumentado para compensar menos enemigos
 						const maxHp = enemy.target.isFooter ? 300 : 100;
 						enemy.target.el.style.opacity = enemy.target.hp / maxHp;
 						
@@ -1051,7 +1065,6 @@
 							enemy.target.el.style.visibility = 'hidden';
 							destroyed++;
 							
-							// --- ÚNICA CONDICIÓN DE VICTORIA: EL FOOTER CAE ---
 							if (enemy.target.isFooter) {
 								triggerGameEnd();
 							}
@@ -1060,9 +1073,9 @@
 						}
 					}
 				} else {
-					// Si no hay targets (ej. ganaron pero footer muriendo), se mueven al centro
-					enemy.x += (window.innerWidth/2 - enemy.x) * 0.01;
-					enemy.y += (window.scrollY + window.innerHeight/2 - enemy.y) * 0.01;
+					// Movimiento errático si no tienen target
+					enemy.x += (Math.random() - 0.5) * 5;
+					enemy.y += (Math.random() - 0.5) * 5;
 					enemy.el.style.left = enemy.x + 'px';
 					enemy.el.style.top = enemy.y + 'px';
 				}
