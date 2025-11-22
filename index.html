@@ -3,14 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Galería de Pósters Científicos + Zerg Rush</title>
+	<title>Galería COINSI 2025 + Final Épico</title>
 	<!-- Inclusión de Tailwind CSS -->
 	<script src="https://cdn.tailwindcss.com"></script>
 	<style>
 		/* Estilo para la fuente Inter */
 		body {
 			font-family: 'Inter', sans-serif;
-			overflow-x: hidden; /* Prevenir scroll horizontal por los zerglings */
+			overflow-x: hidden;
 		}
 		/* Estilos para el modal */
 		.modal-backdrop {
@@ -20,9 +20,9 @@
 			transition: transform 0.3s ease;
 		}
 		
-		/* Clase para el banner del encabezado */
+		/* --- IMAGEN DE BANNER --- */
 		.hero-banner {
-			background-image: url('https://raw.githubusercontent.com/DevScience/posters/refs/heads/main/coinsi2025.png');
+			background-image: url('https://raw.githubusercontent.com/DevScience/poster/main/coinsi2025.png');
 			background-size: cover;
 			background-position: center center;
 		}
@@ -48,8 +48,6 @@
 		/* --- ESTILOS ZERG RUSH --- */
 		.zergling {
 			position: absolute;
-			width: 20px;
-			height: 20px;
 			border-radius: 50%;
 			cursor: crosshair;
 			z-index: 9999;
@@ -59,25 +57,67 @@
 			justify-content: center;
 			font-weight: bold;
 			font-size: 10px;
-			color: rgba(255,255,255,0.8);
+			color: rgba(255,255,255,0.9);
 			user-select: none;
 			border: 2px solid white;
+			transition: transform 0.1s, opacity 0.1s, background-color 1.5s ease, width 1s ease, height 1s ease;
 		}
-		.zergling.type-y { background-color: #fbbc05; } /* Amarillo Google */
-		.zergling.type-r { background-color: #ea4335; } /* Rojo Google */
+		.zergling.type-y { background-color: #fbbc05; }
+		.zergling.type-r { background-color: #ea4335; }
+		.zergling.type-tank { background-color: #a105fb; border-color: #ffd700; }
+
+		/* Efecto de golpe */
+		.zergling.hit {
+			filter: brightness(200%);
+			transform: scale(0.8);
+		}
 		
-		/* Barra de vida del juego (score) */
+		/* HUD del juego */
 		#zerg-hud {
 			position: fixed;
 			top: 20px;
 			right: 20px;
-			background: rgba(0,0,0,0.8);
+			background: rgba(15, 23, 42, 0.95);
 			color: white;
 			padding: 15px;
-			border-radius: 8px;
+			border-radius: 12px;
 			z-index: 10000;
 			display: none;
 			font-family: monospace;
+			border: 1px solid #334155;
+			box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+			backdrop-filter: blur(4px);
+			min-width: 200px;
+		}
+		.hud-stat {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 6px;
+			font-size: 0.9rem;
+		}
+
+		/* Mensaje final (Overlay) */
+		#end-message {
+			position: fixed;
+			inset: 0;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			z-index: 9998;
+			opacity: 0;
+			transition: opacity 2s ease-in-out;
+			pointer-events: none;
+			background: rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(2px);
+		}
+		/* Animación de entrada suave para el texto final */
+		.end-text-anim {
+			animation: fadeInUp 1.5s ease-out forwards;
+		}
+		@keyframes fadeInUp {
+			from { opacity: 0; transform: translateY(30px); }
+			to { opacity: 1; transform: translateY(0); }
 		}
 	</style>
 	<!-- Importar la fuente Inter de Google Fonts -->
@@ -89,10 +129,26 @@
 
 	<!-- HUD del Juego -->
 	<div id="zerg-hud">
-		<div class="text-xl font-bold text-red-400">ZERG RUSH</div>
-		<div>Puntuación: <span id="score-val">0</span></div>
-		<div>Elementos destruidos: <span id="destroyed-val">0</span></div>
-		<button onclick="location.reload()" class="mt-2 px-3 py-1 bg-white text-black text-xs rounded font-bold hover:bg-gray-200">REINICIAR</button>
+		<div class="text-lg font-extrabold text-red-500 mb-3 border-b border-slate-600 pb-2 flex justify-between items-center">
+			ZERG RUSH
+			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">EXTREME</span>
+		</div>
+		<div class="hud-stat text-slate-300"><span>Puntos:</span> <span id="score-val" class="text-emerald-400 font-bold font-mono">0</span></div>
+		<div class="hud-stat text-slate-300"><span>Nivel:</span> <span id="level-val" class="text-amber-400 font-bold font-mono">1</span></div>
+		<div class="hud-stat text-slate-300"><span>Enjambre:</span> <span id="count-val" class="text-white font-mono">0</span></div>
+		
+		<div class="mt-4 pt-3 border-t border-slate-600">
+			<div class="text-[10px] text-slate-400 mb-2 uppercase tracking-wider font-semibold text-center">Misión: Proteger el Footer</div>
+			<button onclick="location.reload()" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded shadow transition-colors font-bold uppercase tracking-wide">
+				Reiniciar
+			</button>
+		</div>
+	</div>
+
+	<!-- Mensaje final Centrado -->
+	<div id="end-message">
+		<h1 class="text-4xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-6 drop-shadow-sm text-center leading-tight">Fue una buena experiencia</h1>
+		<p class="text-2xl md:text-4xl text-slate-700 font-light text-center">¡Nos vemos en COINSI 2026!</p>
 	</div>
 
 	<!-- Encabezado -->
@@ -107,13 +163,9 @@
 	<!-- Contenido Principal -->
 	<div class="container mx-auto px-6 py-12 relative">
 
-		<!-- Imagen de Resultados (Nueva) -->
+		<!-- Imagen de Resultados -->
 		<div class="mb-10 flex justify-center target-element">
-			<img 
-				src="https://raw.githubusercontent.com/DevScience/poster/refs/heads/main/resultscoinsi2025.jpg" 
-				alt="Resultados COINSI 2025" 
-				class="w-full max-w-4xl rounded-xl shadow-lg border border-slate-200"
-			>
+			<img src="https://raw.githubusercontent.com/DevScience/poster/main/resultscoinsi2025.jpg" alt="Resultados COINSI 2025" class="w-full max-w-4xl rounded-xl shadow-lg border border-slate-200">
 		</div>
 		
 		<!-- Buscador Centrado -->
@@ -133,8 +185,11 @@
 
 		<!-- Botón para iniciar el juego -->
 		<div class="mb-16 text-center">
-			<button onclick="startZergRush()" id="start-zerg-btn" class="text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-full border border-red-200 transition-all uppercase tracking-wider">
-				⚠️ Iniciar Zerg Rush
+			<button onclick="startZergRush()" id="start-zerg-btn" class="group relative inline-flex items-center justify-center px-8 py-3 text-sm font-bold text-white transition-all duration-200 bg-red-600 font-pj rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600 hover:bg-red-700 shadow-lg hover:shadow-red-500/50 overflow-hidden">
+				<span class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-black"></span>
+				<span class="relative flex items-center gap-2 uppercase tracking-widest">
+					⚠️ Iniciar Zerg Rush
+				</span>
 			</button>
 		</div>
 
@@ -204,22 +259,22 @@
 		</div>
 	</div>
 
-	<!-- Footer -->
-	<footer class="bg-white text-slate-500 text-center py-10 mt-12 border-t border-slate-200 target-element">
+	<!-- Footer (ELEMENTO OBJETIVO FINAL - ID: main-footer) -->
+	<footer id="main-footer" class="bg-white text-slate-500 text-center py-10 mt-12 border-t border-slate-200 target-element relative z-10">
 		<p class="text-sm font-medium">&copy; 2025 COINSI. Innovación y Ciencia.</p>
 	</footer>
 
 	<script>
 		// --- Paletas de Color UX Modernas ---
 		const modernPalettes = [
-			{ name: 'Indigo',   hex: '6366f1', bg: 'bg-indigo-50/50',   border: 'border-indigo-100', text: 'text-indigo-900', accent: 'text-indigo-600', badge: 'bg-indigo-100 text-indigo-700' },
-			{ name: 'Emerald',  hex: '10b981', bg: 'bg-emerald-50/50',  border: 'border-emerald-100', text: 'text-emerald-900', accent: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700' },
-			{ name: 'Rose',     hex: 'f43f5e', bg: 'bg-rose-50/50',     border: 'border-rose-100',    text: 'text-rose-900',    accent: 'text-rose-600',    badge: 'bg-rose-100 text-rose-700' },
-			{ name: 'Sky',      hex: '0ea5e9', bg: 'bg-sky-50/50',      border: 'border-sky-100',     text: 'text-sky-900',     accent: 'text-sky-600',     badge: 'bg-sky-100 text-sky-700' },
-			{ name: 'Amber',    hex: 'f59e0b', bg: 'bg-amber-50/50',    border: 'border-amber-100',   text: 'text-amber-900',   accent: 'text-amber-600',   badge: 'bg-amber-100 text-amber-800' },
-			{ name: 'Violet',   hex: '8b5cf6', bg: 'bg-violet-50/50',   border: 'border-violet-100',  text: 'text-violet-900',  accent: 'text-violet-600',  badge: 'bg-violet-100 text-violet-700' },
-			{ name: 'Teal',     hex: '14b8a6', bg: 'bg-teal-50/50',     border: 'border-teal-100',    text: 'text-teal-900',    accent: 'text-teal-600',    badge: 'bg-teal-100 text-teal-700' },
-			{ name: 'Slate',    hex: '64748b', bg: 'bg-slate-50/50',    border: 'border-slate-200',   text: 'text-slate-800',   accent: 'text-slate-600',   badge: 'bg-slate-200 text-slate-700' }
+			{ name: 'Indigo', hex: '6366f1', bg: 'bg-indigo-50/50', border: 'border-indigo-100', text: 'text-indigo-900', accent: 'text-indigo-600', badge: 'bg-indigo-100 text-indigo-700' },
+			{ name: 'Emerald', hex: '10b981', bg: 'bg-emerald-50/50', border: 'border-emerald-100', text: 'text-emerald-900', accent: 'text-emerald-600', badge: 'bg-emerald-100 text-emerald-700' },
+			{ name: 'Rose', hex: 'f43f5e', bg: 'bg-rose-50/50', border: 'border-rose-100', text: 'text-rose-900', accent: 'text-rose-600', badge: 'bg-rose-100 text-rose-700' },
+			{ name: 'Sky', hex: '0ea5e9', bg: 'bg-sky-50/50', border: 'border-sky-100', text: 'text-sky-900', accent: 'text-sky-600', badge: 'bg-sky-100 text-sky-700' },
+			{ name: 'Amber', hex: 'f59e0b', bg: 'bg-amber-50/50', border: 'border-amber-100', text: 'text-amber-900', accent: 'text-amber-600', badge: 'bg-amber-100 text-amber-800' },
+			{ name: 'Violet', hex: '8b5cf6', bg: 'bg-violet-50/50', border: 'border-violet-100', text: 'text-violet-900', accent: 'text-violet-600', badge: 'bg-violet-100 text-violet-700' },
+			{ name: 'Teal', hex: '14b8a6', bg: 'bg-teal-50/50', border: 'border-teal-100', text: 'text-teal-900', accent: 'text-teal-600', badge: 'bg-teal-100 text-teal-700' },
+			{ name: 'Slate', hex: '64748b', bg: 'bg-slate-50/50', border: 'border-slate-200', text: 'text-slate-800', accent: 'text-slate-600', badge: 'bg-slate-200 text-slate-700' }
 		];
 
 		// --- Datos ---
@@ -397,7 +452,7 @@
 			if (dynamicImage.includes('placehold.co')) {
 				const parts = dynamicImage.split('?');
 				const query = parts[1] ? `?${parts[1]}` : '';
-				dynamicImage = `https://placehold.co/400x250/${theme.hex}/FFFFFF${query}&font=montserrat`; 
+				dynamicImage = `https://placehold.co/400x250/${theme.hex}/FFFFFF${query}&font=montserrat`;
 			}
 			return { ...poster, theme: theme, finalImage: dynamicImage };
 		});
@@ -422,11 +477,10 @@
 			const theme = poster.theme;
 			const card = document.createElement('div');
 			
-			// Añadimos la clase 'target-element' para que el Zerg Rush la detecte
 			card.className = `
-				bg-white rounded-2xl overflow-hidden border border-slate-100 card-shadow 
+				bg-white rounded-2xl overflow-hidden border border-slate-100 card-shadow
 				flex flex-col h-full transform transition-all duration-300 hover:-translate-y-1
-				target-element
+				target-element poster-card
 			`;
 
 			const hasPdf = poster.pdfUrl ? true : false;
@@ -443,12 +497,7 @@
 
 			card.innerHTML = `
 				<div class="relative h-48 overflow-hidden group cursor-pointer" onclick="openModal('${poster.finalImage}', '${poster.titulo}')">
-					<img 
-						src="${poster.finalImage}" 
-						alt="${poster.titulo}" 
-						class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-						onerror="this.src='https://placehold.co/400x250/cbd5e1/ffffff?text=Sin+Imagen'"
-					>
+					<img src="${poster.finalImage}" alt="${poster.titulo}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/400x250/cbd5e1/ffffff?text=Sin+Imagen'">
 					<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 					
 					<div class="absolute top-3 right-3 z-10">
@@ -475,14 +524,14 @@
 
 					<div class="mt-auto pl-3 pt-4 flex gap-2 border-t border-slate-50">
 						${hasPdf ? `
-							<button onclick="event.stopPropagation(); openPdfModal('${poster.pdfUrl}', '${poster.titulo}')" 
+							<button onclick="event.stopPropagation(); openPdfModal('${poster.pdfUrl}', '${poster.titulo}')" 
 								class="flex-1 group flex justify-center items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors border border-slate-100 hover:border-indigo-100">
 								<svg class="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
 								PDF
 							</button>` : ''}
 						
 						${hasVideo ? `
-							<button onclick="event.stopPropagation(); openVideoModal('${poster.videoUrl}', '${poster.titulo}')" 
+							<button onclick="event.stopPropagation(); openVideoModal('${poster.videoUrl}', '${poster.titulo}')" 
 								class="flex-1 group flex justify-center items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-600 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors border border-slate-100 hover:border-rose-100">
 								<svg class="w-4 h-4 text-slate-400 group-hover:text-rose-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
 								Video
@@ -588,115 +637,333 @@
 		renderPosters();
 
 		// =================================================
-		// === LOGICA DEL ZERG RUSH (GAME) ===
+		// === LOGICA DEL ZERG RUSH EXTREME (GAME) ===
 		// =================================================
 		
 		let zerglings = [];
 		let targets = [];
 		let gameInterval;
-		let spawnInterval;
+		let spawnTimer;
+		let difficultyTimer;
+		
+		// Variables de estado del juego
 		let score = 0;
 		let destroyed = 0;
 		let gameActive = false;
+		let gameEnded = false;
+		let level = 1;
+		
+		// Variables de dificultad dinámica
+		let spawnRate = 800;
+		let zergSpeedBase = 2;
+		let zergHpChance = 0;
+
+		// Footer Target Reference
+		let footerTarget = null;
+
+		// Matriz de letras para el final "COINSI" (Grid 5x7)
+		const letterPatterns = {
+			'C': [[1,0],[2,0],[3,0],[0,1],[0,2],[0,3],[0,4],[0,5],[1,6],[2,6],[3,6]],
+			'O': [[1,0],[2,0],[3,0],[0,1],[4,1],[0,2],[4,2],[0,3],[4,3],[0,4],[4,4],[0,5],[4,5],[1,6],[2,6],[3,6]],
+			'I': [[0,0],[1,0],[2,0],[1,1],[1,2],[1,3],[1,4],[1,5],[0,6],[1,6],[2,6]],
+			'N': [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,2],[2,3],[3,4],[4,0],[4,1],[4,2],[4,3],[4,4],[4,5],[4,6]],
+			'S': [[1,0],[2,0],[3,0],[0,1],[0,2],[1,3],[2,3],[3,3],[4,4],[4,5],[1,6],[2,6],[3,6]],
+		};
 
 		function startZergRush() {
 			if (gameActive) return;
 			gameActive = true;
-			document.getElementById('start-zerg-btn').style.display = 'none';
-			document.getElementById('zerg-hud').style.display = 'block';
+			gameEnded = false;
 			
-			// Identificar objetivos (elementos con clase 'target-element')
+			// UI Init
+			document.getElementById('start-zerg-btn').style.display = 'none';
+			const hud = document.getElementById('zerg-hud');
+			hud.style.display = 'block';
+			hud.classList.add('end-text-anim'); // Pequeña animación de entrada
+			
+			// Identificar objetivos y encontrar el Footer (BOSS)
+			targets = [];
 			const elements = document.querySelectorAll('.target-element');
 			elements.forEach(el => {
-				if(el.offsetParent !== null) { // Solo elementos visibles
-					targets.push({
+				if(el.offsetParent !== null) {
+					const isFooter = el.id === 'main-footer';
+					const t = {
 						el: el,
 						rect: el.getBoundingClientRect(),
-						hp: 100,
-						originalOpacity: el.style.opacity || 1
-					});
+						// Footer tiene MUCHA más vida para asegurar que sea el último
+						hp: isFooter ? 300 : 100, 
+						originalOpacity: el.style.opacity || 1,
+						isFooter: isFooter
+					};
+					targets.push(t);
+					if (isFooter) footerTarget = t;
 				}
 			});
 
-			// Loop del juego
-			gameInterval = setInterval(updateGame, 50);
+			// Loop principal
+			gameInterval = setInterval(updateGame, 40);
 			
-			// Spawnear enemigos
-			spawnInterval = setInterval(spawnZergling, 800);
+			// Iniciar spawns
+			scheduleNextSpawn();
+
+			// Dificultad progresiva
+			difficultyTimer = setInterval(increaseDifficulty, 5000);
 			
-			// Scroll al top para empezar
+			// Scroll al top para ver la acción
 			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+
+		function increaseDifficulty() {
+			if (!gameActive || gameEnded) return;
+			level++;
+			document.getElementById('level-val').textContent = level;
+
+			// Más rápidos y frecuentes
+			if (zergSpeedBase < 12) zergSpeedBase += 0.5;
+			if (spawnRate > 100) spawnRate -= 50;
+			// Más tanques
+			if (level > 3 && zergHpChance < 0.6) zergHpChance += 0.05;
+
+			const hud = document.getElementById('zerg-hud');
+			hud.style.borderColor = '#ef4444'; // Flash rojo
+			setTimeout(() => hud.style.borderColor = '#334155', 500);
+		}
+
+		function scheduleNextSpawn() {
+			if (!gameActive || gameEnded) return;
+			spawnZergling();
+			spawnTimer = setTimeout(scheduleNextSpawn, spawnRate);
 		}
 
 		function spawnZergling() {
 			const zerg = document.createElement('div');
-			const type = Math.random() > 0.5 ? 'type-r' : 'type-y';
-			zerg.className = `zergling ${type}`;
-			zerg.textContent = 'o';
 			
-			// Posición aleatoria arriba (ajustada al scroll actual)
-			const startX = Math.random() * (window.innerWidth - 20);
+			let type = Math.random() > 0.5 ? 'type-r' : 'type-y';
+			let maxHp = 1;
+			let size = 20;
+
+			// Probabilidad de tanque
+			if (Math.random() < zergHpChance) {
+				type = 'type-tank';
+				maxHp = Math.min(3, Math.floor(level / 2));
+				size = 25 + (maxHp * 2);
+				zerg.style.zIndex = 10000;
+			}
+
+			zerg.className = `zergling ${type}`;
+			zerg.style.width = size + 'px';
+			zerg.style.height = size + 'px';
+			
+			// Aparecer arriba aleatoriamente
+			const startX = Math.random() * (window.innerWidth - 30);
 			const startY = window.scrollY - 50;
 			
 			zerg.style.left = startX + 'px';
 			zerg.style.top = startY + 'px';
 			
-			// Datos del enemigo
 			const enemyData = {
 				el: zerg,
 				x: startX,
 				y: startY,
-				vx: 0,
-				vy: 0,
-				target: null
+				speed: zergSpeedBase + (Math.random() * 1.5),
+				target: null,
+				hp: maxHp,
+				maxHp: maxHp,
+				finalTargetX: null, // Para la formación final
+				finalTargetY: null
 			};
 			
-			// Evento click para matar
-			zerg.addEventListener('click', (e) => {
-				e.stopPropagation();
-				killZergling(enemyData);
-			});
+			// Interacciones
+			const hitHandler = (e) => { e.stopPropagation(); e.preventDefault(); hitZergling(enemyData); };
+			zerg.addEventListener('mousedown', hitHandler);
+			zerg.addEventListener('touchstart', hitHandler);
 			
 			document.body.appendChild(zerg);
 			zerglings.push(enemyData);
+			document.getElementById('count-val').textContent = zerglings.length;
 		}
 
-		function killZergling(enemyData) {
-			const index = zerglings.indexOf(enemyData);
-			if (index > -1) {
-				enemyData.el.remove();
-				zerglings.splice(index, 1);
-				score += 10;
-				document.getElementById('score-val').textContent = score;
+		function hitZergling(enemyData) {
+			if (gameEnded) return; // No matar durante el final pacífico
+			enemyData.hp--;
+			enemyData.el.classList.add('hit');
+			setTimeout(() => enemyData.el.classList.remove('hit'), 100);
+
+			if (enemyData.hp <= 0) {
+				const index = zerglings.indexOf(enemyData);
+				if (index > -1) {
+					enemyData.el.remove();
+					zerglings.splice(index, 1);
+					score += (10 * enemyData.maxHp);
+					document.getElementById('score-val').textContent = score;
+					document.getElementById('count-val').textContent = zerglings.length;
+				}
+			} else {
+				// Se encoje si sobrevive
+				const currentSize = parseInt(enemyData.el.style.width);
+				const newSize = currentSize * 0.8;
+				enemyData.el.style.width = newSize + 'px';
+				enemyData.el.style.height = newSize + 'px';
 			}
 		}
+
+		// --- TRIGGER DEL FINAL DEL JUEGO ---
+		function triggerGameEnd() {
+			gameEnded = true;
+			clearInterval(difficultyTimer);
+			clearTimeout(spawnTimer);
+			
+			// Ocultar HUD
+			document.getElementById('zerg-hud').style.display = 'none';
+			
+			// Mostrar mensaje final
+			const msg = document.getElementById('end-message');
+			msg.style.opacity = 1;
+			msg.classList.add('end-text-anim');
+
+			// Calcular posiciones para formar "COINSI"
+			assignFinalPositions();
+		}
+
+		function assignFinalPositions() {
+			const screenW = window.innerWidth;
+			const screenH = window.innerHeight;
+			// Centrar verticalmente respecto al scroll actual
+			const centerY = window.scrollY + (window.innerHeight / 2);
+			
+			// Configuración de la cuadrícula del texto
+			const startX = screenW / 2 - 320; // Ajuste horizontal
+			const startY = centerY - 50;      // Ajuste vertical
+			const gap = 14;                   // Espacio entre puntos
+			const letterSpacing = 110;        // Espacio entre letras
+
+            // 1. MEZCLAR ALEATORIAMENTE los zerglings existentes
+            zerglings.sort(() => Math.random() - 0.5);
+
+            // 2. CALCULAR PUNTOS REQUERIDOS
+            let totalPointsNeeded = 0;
+            const word = ['C', 'O', 'I', 'N', 'S', 'I'];
+            word.forEach(char => {
+                totalPointsNeeded += letterPatterns[char].length;
+            });
+
+            // 3. SPAWN DE REFUERZOS si faltan
+            if (zerglings.length < totalPointsNeeded) {
+                const missing = totalPointsNeeded - zerglings.length;
+                for(let i=0; i<missing; i++) {
+                    spawnVisualZergling(screenW, centerY);
+                }
+            }
+
+			let zergIndex = 0;
+			
+			word.forEach((char, charIdx) => {
+				const pattern = letterPatterns[char];
+				const letterOffsetX = charIdx * letterSpacing;
+
+				pattern.forEach(pt => {
+					if (zergIndex < zerglings.length) {
+						const z = zerglings[zergIndex];
+						// Asignar destino final
+						z.finalTargetX = startX + letterOffsetX + (pt[0] * gap);
+						z.finalTargetY = startY + (pt[1] * gap);
+						
+						// CAMBIO DE COLOR: Indigo COINSI
+						z.el.style.backgroundColor = '#6366f1'; 
+						z.el.style.borderColor = '#818cf8';
+                        z.el.style.opacity = 1;
+						// Quitar clases de tipo para que no interfieran
+						z.el.classList.remove('type-y', 'type-r', 'type-tank');
+                        // Unificar tamaño
+                        z.el.style.width = '12px';
+                        z.el.style.height = '12px';
+						
+						zergIndex++;
+					}
+				});
+			});
+			
+			// Los zerglings sobrantes se dispersan pacíficamente
+			for(let i = zergIndex; i < zerglings.length; i++) {
+				const angle = Math.random() * Math.PI * 2;
+				const radius = Math.max(screenW, screenH);
+				zerglings[i].finalTargetX = (screenW/2) + Math.cos(angle) * radius;
+				zerglings[i].finalTargetY = centerY + Math.sin(angle) * radius;
+				zerglings[i].el.style.opacity = 0.5; // Se desvanecen un poco
+			}
+		}
+
+        // Función auxiliar para crear zerglings de relleno si faltan
+        function spawnVisualZergling(sw, sh) {
+            const zerg = document.createElement('div');
+            zerg.className = 'zergling';
+            zerg.style.width = '12px';
+            zerg.style.height = '12px';
+            zerg.style.backgroundColor = '#6366f1';
+            zerg.style.borderColor = '#818cf8';
+            
+            // Aparecen fuera de pantalla y vuelan hacia el texto
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.max(sw, sh);
+            const sx = (sw/2) + Math.cos(angle) * r;
+            const sy = sh + Math.sin(angle) * r;
+
+            zerg.style.left = sx + 'px';
+            zerg.style.top = sy + 'px';
+            
+            document.body.appendChild(zerg);
+            
+            zerglings.push({
+                el: zerg,
+                x: sx,
+                y: sy,
+                speed: 0, // Controlado por lógica finalTarget
+                hp: 1,
+                finalTargetX: null,
+                finalTargetY: null
+            });
+        }
 
 		function updateGame() {
-			// Limpiar objetivos muertos de la lista lógica (no visual)
-			targets = targets.filter(t => t.hp > 0);
-
-			if (targets.length === 0) {
-				// Game Over condition logic here if needed
+			// MODO FINAL: Coreografía
+			if (gameEnded) {
+				zerglings.forEach(enemy => {
+					if (enemy.finalTargetX !== null) {
+						const dx = enemy.finalTargetX - enemy.x;
+						const dy = enemy.finalTargetY - enemy.y;
+						// Movimiento suave (Linear Interpolation)
+						enemy.x += dx * 0.08; 
+						enemy.y += dy * 0.08;
+						enemy.el.style.left = enemy.x + 'px';
+						enemy.el.style.top = enemy.y + 'px';
+					}
+				});
+				return;
 			}
 
-			zerglings.forEach((enemy, index) => {
-				// Encontrar objetivo más cercano si no tiene uno
+			// MODO JUEGO: Caos y Destrucción
+			targets = targets.filter(t => t.hp > 0);
+
+			zerglings.forEach((enemy) => {
 				if (!enemy.target || enemy.target.hp <= 0) {
 					let minDist = Infinity;
 					let closest = null;
 					
-					targets.forEach(t => {
-						// Recalcular rect porque el scroll cambia
-						const rect = t.el.getBoundingClientRect();
-						const centerX = rect.left + rect.width / 2 + window.scrollX;
-						const centerY = rect.top + rect.height / 2 + window.scrollY;
-						
-						const dist = Math.hypot(centerX - enemy.x, centerY - enemy.y);
-						if (dist < minDist) {
-							minDist = dist;
-							closest = t;
-						}
-					});
+					// IA Mejorada: Si el Footer está vivo, a veces lo priorizan obsesivamente
+					if (footerTarget && footerTarget.hp > 0 && Math.random() > 0.6) { // 40% chance de ir por el Boss
+						closest = footerTarget;
+					} else {
+						targets.forEach(t => {
+							const rect = t.el.getBoundingClientRect();
+							const centerX = rect.left + rect.width / 2 + window.scrollX;
+							const centerY = rect.top + rect.height / 2 + window.scrollY;
+							const dist = Math.hypot(centerX - enemy.x, centerY - enemy.y);
+							if (dist < minDist) {
+								minDist = dist;
+								closest = t;
+							}
+						});
+					}
 					enemy.target = closest;
 				}
 
@@ -705,33 +972,38 @@
 					const targetX = rect.left + rect.width / 2 + window.scrollX;
 					const targetY = rect.top + rect.height / 2 + window.scrollY;
 
-					// Mover hacia objetivo
 					const angle = Math.atan2(targetY - enemy.y, targetX - enemy.x);
-					const speed = 3;
-					
-					enemy.x += Math.cos(angle) * speed;
-					enemy.y += Math.sin(angle) * speed;
+					enemy.x += Math.cos(angle) * enemy.speed;
+					enemy.y += Math.sin(angle) * enemy.speed;
 					
 					enemy.el.style.left = enemy.x + 'px';
 					enemy.el.style.top = enemy.y + 'px';
 
-					// Detectar colisión
 					const dist = Math.hypot(targetX - enemy.x, targetY - enemy.y);
 					
-					if (dist < 50) { // Distancia de ataque
-						enemy.target.hp -= 2; // Daño
-						enemy.target.el.style.opacity = enemy.target.hp / 100;
+					if (dist < 50) { // Rango de ataque
+						enemy.target.hp -= 2; 
+						// Footer tiene más HP (300), el resto (100)
+						const maxHp = enemy.target.isFooter ? 300 : 100;
+						enemy.target.el.style.opacity = enemy.target.hp / maxHp;
 						
 						if (enemy.target.hp <= 0) {
 							enemy.target.el.style.visibility = 'hidden';
 							destroyed++;
-							document.getElementById('destroyed-val').textContent = destroyed;
-							enemy.target = null; // Buscar nuevo target
+							// Actualizar HUD si sigue visible
+							const destroyedEl = document.getElementById('destroyed-val'); // Nota: en el HUD nuevo no puse destroyed count para simplificar, pero la lógica sigue
+							
+							// --- DETECCIÓN CRÍTICA DEL FOOTER ---
+							if (enemy.target.isFooter) {
+								triggerGameEnd();
+							}
+							
+							enemy.target = null;
 						}
 					}
 				} else {
-					// Si no hay targets, bajar
-					enemy.y += 2;
+					// Si no hay targets, deambulan hacia abajo
+					enemy.y += enemy.speed;
 					enemy.el.style.top = enemy.y + 'px';
 				}
 			});
