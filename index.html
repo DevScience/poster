@@ -60,8 +60,8 @@
 			color: rgba(255,255,255,0.9);
 			user-select: none;
 			border: 2px solid white;
-			/* Transiciones suaves para movimiento y final */
-			transition: transform 0.1s, opacity 0.1s, background-color 1.5s ease, width 1s ease, height 1s ease, left 1s ease, top 1s ease; 
+			/* Transiciones optimizadas para velocidad */
+			transition: transform 0.05s, opacity 0.1s, background-color 1.5s ease, width 1s ease, height 1s ease, left 1s ease, top 1s ease; 
 		}
 		.zergling.type-y { background-color: #fbbc05; }
 		.zergling.type-r { background-color: #ea4335; }
@@ -109,7 +109,7 @@
 			opacity: 0;
 			transition: opacity 2s ease-in-out;
 			pointer-events: none;
-			background: rgba(255, 255, 255, 0.85); /* Fondo blanco semitransparente para legibilidad */
+			background: rgba(255, 255, 255, 0.85); /* Fondo blanco semitransparente */
 			backdrop-filter: blur(5px);
 			padding: 20px; 
 		}
@@ -133,7 +133,7 @@
 	<div id="zerg-hud">
 		<div class="text-lg font-extrabold text-red-500 mb-3 border-b border-slate-600 pb-2 flex justify-between items-center">
 			ZERG RUSH
-			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">SECUENCIAL</span>
+			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">TURBO</span>
 		</div>
 		<div class="hud-stat text-slate-300"><span>Puntos:</span> <span id="score-val" class="text-emerald-400 font-bold font-mono">0</span></div>
 		<div class="hud-stat text-slate-300"><span>Nivel:</span> <span id="level-val" class="text-amber-400 font-bold font-mono">1</span></div>
@@ -263,7 +263,7 @@
 
 	<!-- Footer (ELEMENTO OBJETIVO FINAL - ID: main-footer) -->
 	<footer id="main-footer" class="bg-white text-slate-500 text-center py-10 mt-12 border-t border-slate-200 target-element relative z-10">
-		<p class="text-sm font-medium">&copy; 2025 COINSI - Congreso Internacional de Ingeniería de Sistemas.</p>
+		<p class="text-sm font-medium">&copy; 2025 COINSI. Innovación y Ciencia.</p>
 	</footer>
 
 	<script>
@@ -656,9 +656,9 @@
 		let gameEnded = false;
 		let level = 1;
 		
-		// Variables de dificultad dinámica
-		let spawnRate = 800;
-		let zergSpeedBase = 2;
+		// Variables de dificultad dinámica (TURBO)
+		let spawnRate = 400; // Spawn inicial muy rápido
+		let zergSpeedBase = 5; // Velocidad inicial rápida
 		let zergHpChance = 0;
 
 		// Footer Target Reference
@@ -678,17 +678,32 @@
 			gameActive = true;
 			gameEnded = false;
 			
+			// Reiniciar variables de dificultad
+			level = 1;
+			spawnRate = 400;
+			zergSpeedBase = 5;
+			zergHpChance = 0;
+			score = 0;
+			destroyed = 0;
+			zerglings.forEach(z => z.el.remove());
+			zerglings = [];
+			
 			// UI Init
 			document.getElementById('start-zerg-btn').style.display = 'none';
 			const hud = document.getElementById('zerg-hud');
 			hud.style.display = 'block';
 			hud.classList.add('end-text-anim');
+			document.getElementById('end-message').style.opacity = 0;
 			
 			// Identificar objetivos y encontrar el Footer (BOSS)
 			targets = [];
 			const elements = document.querySelectorAll('.target-element');
 			elements.forEach(el => {
 				if(el.offsetParent !== null) {
+					// Restaurar visibilidad y opacidad de elementos anteriores
+					el.style.visibility = 'visible';
+					el.style.opacity = 1;
+					
 					const isFooter = el.id === 'main-footer';
 					const t = {
 						el: el,
@@ -703,13 +718,16 @@
 				}
 			});
 
-			// Loop principal
-			gameInterval = setInterval(updateGame, 40);
+			// Loop principal (30ms = ~33 FPS fluido)
+			if (gameInterval) clearInterval(gameInterval);
+			gameInterval = setInterval(updateGame, 30);
 			
 			// Iniciar spawns
+			if (spawnTimer) clearTimeout(spawnTimer);
 			scheduleNextSpawn();
 
 			// Dificultad progresiva
+			if (difficultyTimer) clearInterval(difficultyTimer);
 			difficultyTimer = setInterval(increaseDifficulty, 5000);
 			
 			// Scroll al top para ver la acción
@@ -721,10 +739,11 @@
 			level++;
 			document.getElementById('level-val').textContent = level;
 
-			if (zergSpeedBase < 12) zergSpeedBase += 0.5;
+			// Escalado agresivo (+1 velocidad)
+			if (zergSpeedBase < 15) zergSpeedBase += 1;
 			
 			// Cap de spawn rate para no saturar
-			if (spawnRate > 350) spawnRate -= 50;
+			if (spawnRate > 200) spawnRate -= 50;
 			
 			if (level > 2 && zergHpChance < 0.8) zergHpChance += 0.05;
 
@@ -740,7 +759,7 @@
 		}
 
 		function spawnZergling() {
-			// LÍMITE DE POBLACIÓN
+			// LÍMITE DE POBLACIÓN estricto
 			if (zerglings.length >= MAX_ZERGLINGS) {
 				document.getElementById('count-val').style.color = 'red';
 				return; 
@@ -779,7 +798,7 @@
 				el: zerg,
 				x: startX,
 				y: startY,
-				speed: zergSpeedBase + (Math.random() * 1.5),
+				speed: zergSpeedBase + (Math.random() * 2), // Variación de velocidad
 				target: null,
 				hp: maxHp,
 				maxHp: maxHp,
@@ -962,12 +981,12 @@
 					let minDist = Infinity;
 					let closest = null;
 					
-					// REGLA DE ORO: Si hay objetivos que NO sean el Footer, el Footer NO es una opción válida.
-					// Esto fuerza la destrucción secuencial.
-					const hasNonFooterTargets = targets.some(t => !t.isFooter);
+					// --- LÓGICA SECUENCIAL ESTRICTA ---
+					// Verificar si queda algo VIVO que NO sea el Footer
+					const hasNonFooterTargets = targets.some(t => !t.isFooter && t.hp > 0);
 					
 					targets.forEach(t => {
-						// Si quedan objetivos normales, ignoramos el footer
+						// Si quedan objetivos normales, el footer es INVISIBLE para ellos
 						if (hasNonFooterTargets && t.isFooter) return;
 
 						const rect = t.el.getBoundingClientRect();
@@ -1006,7 +1025,7 @@
 							enemy.target.el.style.visibility = 'hidden';
 							destroyed++;
 							
-							// --- ÚNICA CONDICIÓN DE VICTORIA ---
+							// --- ÚNICA CONDICIÓN DE VICTORIA: EL FOOTER CAE ---
 							if (enemy.target.isFooter) {
 								triggerGameEnd();
 							}
