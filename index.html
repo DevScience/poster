@@ -21,7 +21,7 @@
 		
 		/* Clase para el banner del encabezado */
 		.hero-banner {
-			background-image: url('https://raw.githubusercontent.com/DevScience/poster/refs/heads/main/coinsi2025.png');
+			background-image: url('https://raw.githubusercontent.com/DevScience/posters/refs/heads/main/coinsi2025.png');
 			background-size: cover;
 			background-position: center center;
 		}
@@ -32,6 +32,16 @@
 		}
 		.card-shadow:hover {
 			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+		}
+
+		/* Animación sutil para la copa */
+		@keyframes shine {
+			0% { transform: scale(1); filter: brightness(100%); }
+			50% { transform: scale(1.1); filter: brightness(120%); }
+			100% { transform: scale(1); filter: brightness(100%); }
+		}
+		.trophy-icon {
+			animation: shine 3s infinite ease-in-out;
 		}
 	</style>
 	<!-- Importar la fuente Inter de Google Fonts -->
@@ -52,6 +62,15 @@
 
 	<!-- Contenido Principal -->
 	<div class="container mx-auto px-6 py-12">
+
+		<!-- Imagen de Resultados (Nueva) -->
+		<div class="mb-10 flex justify-center">
+			<img 
+				src="https://raw.githubusercontent.com/DevScience/poster/refs/heads/main/resultscoinsi2025.jpg" 
+				alt="Resultados COINSI 2025" 
+				class="w-full max-w-4xl rounded-xl shadow-lg border border-slate-200"
+			>
+		</div>
 		
 		<!-- Buscador Centrado -->
 		<div class="mb-16">
@@ -154,7 +173,7 @@
 
 		// --- Datos ---
 		const rawPosters = [
-			// --- TERMINADOS (10) ---
+			// --- TERMINADOS ---
 			{
 				titulo: "COMPARACIÓN Y APLICACIÓN DE MODELOS DE INTELIGENCIA ARTIFICIAL PARA LA DETECCIÓN DE URLS DE PHISHING EN UNA EXTENSIÓN WEB",
 				autor: "Ivan Condori; Christian Ticona; Rosario Bustamante",
@@ -177,7 +196,23 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id10",
 				pdfUrl: "https://drive.google.com/file/d/16GEQNJQP3bChwC0vCc3f6iIC14929-qm/view",
 				videoUrl: "https://drive.google.com/file/d/1gYtVvgc2HAxvpxz0wrNKWUDGKQEqp-us/view",
-				categoria: 'desarrollo'
+				categoria: 'terminado'
+			},
+			{
+				titulo: "ANÁLISIS COMPARATIVO DEL PERCEPTRÓN MULTICAPA Y REDES NEURONALES CONVOLUCIONALES PARA LA DETECCIÓN DE INTRUSIONES EN REDES DE ÁREA LOCAL: CASO DE ESTUDIO OTI – UNAP",
+				autor: "Rigoberto Aquisi Accha; Marga I. Ingaluque Arapa",
+				imagenUrl: "https://placehold.co/400x600?text=Póster+Id11",
+				pdfUrl: "https://drive.google.com/file/d/11j803Oq_9Nxun8Gjg_Y3eE_X1Ind41J0/view",
+				videoUrl: "#",
+				categoria: 'terminado'
+			},
+			{
+				titulo: "SISTEMA DE RECONOCIMIENTO FACIAL PARA LA MEJORA DE LA SEGURIDAD EN LA VIGILANCIA DE LA I.E.S. POLITÉCNICO REGIONAL LOS ANDES DE JULIACA",
+				autor: "Lizbeth C. Apaza Quispe; Marga I. Ingaluque Arapa",
+				imagenUrl: "https://placehold.co/400x600?text=Póster+Id12",
+				pdfUrl: "https://drive.google.com/file/d/17EsQcFk_sOGl4aFdfaFSi2wjplElRB-n/view",
+				videoUrl: "#",
+				categoria: 'terminado'
 			},
 			{
 				titulo: "CLASIFICACIÓN AUTOMATIZADA DE LESIONES CUTÁNEAS MEDIANTE MOBILENETV2 CON TRANSFER LEARNING PARA APOYO EN DEMATOLOGÍA",
@@ -188,12 +223,20 @@
 				categoria: 'terminado'
 			},
 			{
+				titulo: "PLATAFORMA EDUCATIVA GAMIFICADA CON ANÁLISIS INTELIGENTE DE DECISIONES E IA ADAPTATIVA PARA FORTALECER COMPETENCIAS EN CIBERSEGURIDAD",
+				autor: "Eder W. Sanca Halanoca; Hernan Zapata Luque; Rogger Humpiri Flores",
+				imagenUrl: "https://placehold.co/400x600?text=Póster+Id14",
+				pdfUrl: "https://drive.google.com/file/d/1Jc1HuCrNlea4GYGSXJqXxi3LXDcz0Yif/view",
+				videoUrl: "#",
+				categoria: 'terminado'
+			},
+			{
 				titulo: "MODELO PREDICTIVO DEL TIMPANISMO EN OVINOS DE LA PROVINCIA DE EL COLLAO – ILAVE",
 				autor: "Vanessa Y. Castro Ccallo; Zulema L. Mamani Huacani",
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id15",
 				pdfUrl: "https://drive.google.com/file/d/1PAKWI73Y72c1XZsOqVRzXovZQWQ9nuY5/view",
 				videoUrl: "https://drive.google.com/file/d/1RkeLIj2GP56CWU7IFnkxCi8Qw5Tfifq9/view",
-				categoria: 'desarrollo'
+				categoria: 'terminado'
 			},
 			{
 				titulo: "SISTEMA WEB INTELIGENTE DE GESTIÓN Y OPTIMIZACIÓN OPERATIVA PARA EL SERENAZGO DE LA MUNICIPALIDAD PROVINCIAL DE PUNO",
@@ -201,7 +244,7 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id16",
 				pdfUrl: "https://drive.google.com/file/d/1RYwWW7g_1EpYAXDEvnRQjb4qebMpp0Q_/view",
 				videoUrl: "https://drive.google.com/file/d/1yOXlGfLn3KdoauCIqsoKeFFmPHSa6qcO/view",
-				categoria: 'desarrollo'
+				categoria: 'terminado'
 			},
 			{
 				titulo: "MODELO CNN PARA DETECCIÓN DE ENFERMEDADES EN HOJAS DE ALFALFA (MEDICAGO SATIVA L.) EN UNA PARCELA AGRÍCOLA DEL DISTRITO DE AZÁNGARO.",
@@ -209,7 +252,7 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id17",
 				pdfUrl: "https://drive.google.com/file/d/1w3MDpuxmbZ4_wIsp1JtXj9hnm7Gcxydj/view",
 				videoUrl: "https://drive.google.com/file/d/1NiuZDzv6HoNX81bw3JOFxfqa8biqv_V_/view",
-				categoria: 'desarrollo'
+				categoria: 'terminado'
 			},
 			{
 				titulo: "EVALUACIÓN DE ARQUITECTURAS DE APRENDIZAJE PROFUNDO PARA LA PREDICCIÓN CLIMÁTICA DE HELADAS EN PUNO USANDO DATOS SATELITALES MERRA-2",
@@ -217,7 +260,8 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id20",
 				pdfUrl: "https://drive.google.com/file/d/1ZJINNvr_458Gg1UOdSJetezvUcQR_2Ay/view",
 				videoUrl: "https://drive.google.com/file/d/1efZimg3rlCDP_Xnsb-aCOM7Y93qn36pn/view",
-				categoria: 'terminado'
+				categoria: 'terminado',
+				premio: true // PREMIO AGREGADO
 			},
 			{
 				titulo: "NAIVE BAYES Y DATOS LIKERT: SUPERIORIDAD DEL ONE-HOT ENCODING EN LA PREDICCIÓN DE SATISFACCIÓN ESTUDIANTIL",
@@ -236,7 +280,7 @@
 				categoria: 'terminado'
 			},
 			
-			// --- DESARROLLO (10) ---
+			// --- DESARROLLO ---
 			{
 				titulo: "GAMIFICACIÓN Y RETROALIMENTACIÓN FORMATIVA EN UNA APLICACIÓN EDUCATIVA MÓVIL PARA FORTALECER LA COMPRENSIÓN LECTORA EN ESTUDIANTES DE PRIMARIA EN ZONAS RURALES",
 				autor: "Sandra Mamani Condemayta; Rogger Humpiri Flores",
@@ -267,7 +311,7 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id38",
 				pdfUrl: "https://drive.google.com/file/d/1782-ybkQ7dXbPgJq5d6LwNWbo3waBhg2/view",
 				videoUrl: "https://drive.google.com/file/d/1hEVqGbI8LENOG_QhYXN7kA0BMikVKXcG/view",
-				categoria: 'terminado'
+				categoria: 'desarrollo'
 			},
 			{
 				titulo: "DE DATOS A DECISIONES: ALGORITMOS DE BOOSTING APLICADOS A PREDICCIÓN DE DEMANDA EN FASHION RETAIL",
@@ -283,7 +327,7 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id41",
 				pdfUrl: "https://drive.google.com/file/d/1_Rqwe1z8NmBhiufivR2nplR03_RFe1X8/view",
 				videoUrl: "https://drive.google.com/file/d/1UPZ9Ps1w9fd7UYHIC7iUblkMxDe5iAj2/view",
-				categoria: 'terminado'
+				categoria: 'desarrollo'
 			},
 			{
 				titulo: "SISTEMA INTELIGENTE DE OPTIMIZACIÓN DE RUTAS PARA RECOLECCIÓN DE RESIDUOS SÓLIDOS URBANOS MEDIANTE DEEP LEARNING Y ALGORITMOS HEURÍSTICOS: CASO PUNO, PERÚ",
@@ -299,7 +343,8 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id43",
 				pdfUrl: "https://drive.google.com/file/d/1y-e4pSmpy1cTj-MsSEsJiUW-ADZCKq1v/view",
 				videoUrl: "https://drive.google.com/file/d/1xbJCFiw4KuQdzR9dfsOygpDLyCcC2s94/view",
-				categoria: 'desarrollo'
+				categoria: 'desarrollo',
+				premio: true // PREMIO AGREGADO
 			},
 			{
 				titulo: "ACELERANDO LA ADAPTACIÓN DE DOMINIO MEDIANTE NAIVE BAYES-AG: UN ENFOQUE PARA LA CLASIFICACIÓN EFICIENTE EN ENTORNOS DE APRENDIZAJE POR TRANSFERENCIA",
@@ -307,7 +352,7 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id46",
 				pdfUrl: "https://drive.google.com/file/d/1ZPracCE9gRjZoh_YlHKeXhUFJ7wUIQB7/view",
 				videoUrl: "https://drive.google.com/file/d/1k3uio4-dxJ__3muQA6WQCgLYfiW2H_AA/view",
-				categoria: 'terminado'
+				categoria: 'desarrollo'
 			},
 			{
 				titulo: "MODELO HÍBRIDO SS-LGBM: DETECCIÓN OPTIMIZADA DE ATAQUES MINORITARIOS CON SMOTE ESTRATÉGICO Y ENSAMBLES DE ÁRBOLES",
@@ -315,7 +360,7 @@
 				imagenUrl: "https://placehold.co/400x600?text=Póster+Id48",
 				pdfUrl: "https://drive.google.com/file/d/1V-I_XuM6mue5NWYHPGhbKqQ3e0trhcJj/view",
 				videoUrl: "https://drive.google.com/file/d/1r5KtGm4S0xeGtA4AK-qXE3I1PfskopHw/view",
-				categoria: 'terminado'
+				categoria: 'desarrollo'
 			}
 		];
 
@@ -324,19 +369,11 @@
 			// Asignar tema aleatorio
 			const theme = modernPalettes[Math.floor(Math.random() * modernPalettes.length)];
 			
-			// Modificar la URL del placeholder para usar el color Hex del tema
-			// Así la imagen coincide con el borde de la tarjeta
+			// Modificar la URL del placeholder
 			let dynamicImage = poster.imagenUrl;
 			if (dynamicImage.includes('placehold.co')) {
-				
 				const parts = dynamicImage.split('?');
-				const baseUrl = parts[0];
 				const query = parts[1] ? `?${parts[1]}` : '';
-				
-				
-				// Estructura placehold.co: /ancho x alto / colorFondo / colorTexto
-				// Usamos el Hex del tema para fondo, y blanco (FFFFFF) para texto
-				// El 'query' mantiene el texto original del póster
 				dynamicImage = `https://placehold.co/400x250/${theme.hex}/FFFFFF${query}&font=montserrat`; 
 			}
 
@@ -355,11 +392,9 @@
 		const noResultsDesarrollo = document.getElementById('no-results-desarrollo');
 		const countTerminadosEl = document.getElementById('count-terminados');
 		const countDesarrolloEl = document.getElementById('count-desarrollo');
-
 		const modal = document.getElementById('image-modal');
 		const modalImage = document.getElementById('modal-image');
 		const modalTitle = document.getElementById('modal-title');
-
 		const pdfModal = document.getElementById('pdf-modal');
 		const pdfFrame = document.getElementById('pdf-frame');
 		const pdfModalTitle = document.getElementById('pdf-modal-title');
@@ -369,15 +404,23 @@
 			const theme = poster.theme;
 			const card = document.createElement('div');
 			
-			// Diseño: Tarjeta 
 			card.className = `
 				bg-white rounded-2xl overflow-hidden border border-slate-100 card-shadow 
 				flex flex-col h-full transform transition-all duration-300 hover:-translate-y-1
 			`;
 
-			// Botones de acción
 			const hasPdf = poster.pdfUrl ? true : false;
 			const hasVideo = poster.videoUrl && poster.videoUrl !== '#' ? true : false;
+
+			// Badge de Premio Dorado
+			const awardBadge = poster.premio ? `
+				<div class="absolute top-3 left-3 z-20 bg-yellow-50 border border-yellow-200 text-yellow-600 px-2 py-1 rounded-lg shadow-sm flex items-center gap-1.5 backdrop-blur-sm bg-opacity-90">
+					<svg class="w-4 h-4 fill-yellow-500 text-yellow-600 trophy-icon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+						<path d="M10 2a.75.75 0 01.75.75v.5h.5a2.75 2.75 0 012.75 2.75v.5c0 .88-.396 1.67-1.025 2.216A4.75 4.75 0 0110.75 12.5V15h1.75a.75.75 0 010 1.5h-5a.75.75 0 010-1.5h1.75v-2.5A4.75 4.75 0 017.025 8.766 2.753 2.753 0 016 6.5v-.5A2.75 2.75 0 018.75 3.25h.5v-.5A.75.75 0 0110 2z" />
+					</svg>
+					<span class="text-[10px] font-bold uppercase tracking-wider">Ganador</span>
+				</div>
+			` : '';
 
 			card.innerHTML = `
 				<div class="relative h-48 overflow-hidden group cursor-pointer" onclick="openModal('${poster.finalImage}', '${poster.titulo}')">
@@ -388,15 +431,19 @@
 						onerror="this.src='https://placehold.co/400x250/cbd5e1/ffffff?text=Sin+Imagen'"
 					>
 					<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-					<div class="absolute top-3 right-3">
+					
+					<!-- Badge de Estado (Derecha) -->
+					<div class="absolute top-3 right-3 z-10">
 						<span class="px-2 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/90 backdrop-blur text-slate-700 rounded shadow-sm">
 							${poster.categoria === 'terminado' ? 'Finalizado' : 'En Proceso'}
 						</span>
 					</div>
+
+					<!-- Badge de Premio (Izquierda - Si aplica) -->
+					${awardBadge}
 				</div>
 
 				<div class="p-5 flex flex-col flex-grow relative">
-					<!-- Decoración de borde de color lateral -->
 					<div class="absolute left-0 top-5 bottom-5 w-1 rounded-r ${theme.bg.replace('/50', '')} bg-opacity-100"></div>
 					
 					<div class="pl-3">
@@ -456,11 +503,9 @@
 				}
 			});
 
-			// Actualizar contadores UI
 			countTerminadosEl.textContent = `${countTerminados} proyecto${countTerminados !== 1 ? 's' : ''}`;
 			countDesarrolloEl.textContent = `${countDesarrollo} proyecto${countDesarrollo !== 1 ? 's' : ''}`;
 
-			// Manejo de estados vacíos
 			if (countTerminados === 0) noResultsTerminados.classList.remove('hidden');
 			if (countDesarrollo === 0) noResultsDesarrollo.classList.remove('hidden');
 		}
@@ -489,7 +534,6 @@
 		}
 
 		function openPdfModal(pdfUrl, title) {
-			// Convertir /view a /preview para incrustación de Google Drive
 			const cleanPdfUrl = pdfUrl.includes('/view') ? pdfUrl.replace('/view', '/preview') : pdfUrl;
 			pdfFrame.src = cleanPdfUrl;
 			pdfModalTitle.textContent = title;
@@ -517,19 +561,15 @@
 			if(videoUrl && videoUrl !== '#') window.open(videoUrl, '_blank');
 		}
 
-		// Event Listeners
 		searchInput.addEventListener('input', (e) => renderPosters(e.target.value));
 		
-		// Exponer globalmente
 		window.openModal = openModal;
 		window.closeModal = closeModal;
 		window.openPdfModal = openPdfModal;
 		window.closePdfModal = closePdfModal;
 		window.openVideoModal = openVideoModal;
 
-		// Inicio
 		renderPosters();
 	</script>
 </body>
 </html>
-
