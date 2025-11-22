@@ -60,8 +60,8 @@
 			color: rgba(255,255,255,0.9);
 			user-select: none;
 			border: 2px solid white;
-			/* Transiciones optimizadas para velocidad */
-			transition: transform 0.05s, opacity 0.1s, background-color 1.5s ease, width 1s ease, height 1s ease, left 1s ease, top 1s ease; 
+			/* Transiciones optimizadas */
+			transition: transform 0.05s, opacity 0.1s, background-color 1.5s ease, width 0.5s ease, height 0.5s ease, left 1.5s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); 
 		}
 		.zergling.type-y { background-color: #fbbc05; }
 		.zergling.type-r { background-color: #ea4335; }
@@ -70,7 +70,7 @@
 		/* Efecto de golpe */
 		.zergling.hit {
 			filter: brightness(200%);
-			transform: scale(0.9);
+			transform: scale(0.95);
 		}
 		
 		/* HUD del juego */
@@ -104,21 +104,21 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: center;
+			justify-content: center; /* Centrado vertical base */
 			z-index: 9998;
 			opacity: 0;
 			transition: opacity 2s ease-in-out;
 			pointer-events: none;
-			background: rgba(255, 255, 255, 0.85); /* Fondo blanco semitransparente */
-			backdrop-filter: blur(5px);
-			padding: 20px; 
+			background: rgba(255, 255, 255, 0.9); /* Fondo más sólido para limpieza visual */
+			backdrop-filter: blur(8px);
+			padding-top: 150px; /* EMPUJA EL TEXTO HACIA ABAJO PARA DEJAR ESPACIO A LOS CIRCULOS */
 		}
 		/* Animación de entrada suave para el texto final */
 		.end-text-anim {
 			animation: fadeInUp 1.5s ease-out forwards;
 		}
 		@keyframes fadeInUp {
-			from { opacity: 0; transform: translateY(30px); }
+			from { opacity: 0; transform: translateY(40px); }
 			to { opacity: 1; transform: translateY(0); }
 		}
 	</style>
@@ -133,24 +133,24 @@
 	<div id="zerg-hud">
 		<div class="text-lg font-extrabold text-red-500 mb-3 border-b border-slate-600 pb-2 flex justify-between items-center">
 			ZERG RUSH
-			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">OMNI</span>
+			<span class="text-[10px] bg-red-900 text-red-100 px-1.5 py-0.5 rounded border border-red-700">ELITE</span>
 		</div>
 		<div class="hud-stat text-slate-300"><span>Puntos:</span> <span id="score-val" class="text-emerald-400 font-bold font-mono">0</span></div>
 		<div class="hud-stat text-slate-300"><span>Nivel:</span> <span id="level-val" class="text-amber-400 font-bold font-mono">1</span></div>
-		<div class="hud-stat text-slate-300"><span>Enjambre:</span> <span id="count-val" class="text-white font-mono">0</span>/<span id="max-zerg-val">18</span></div>
+		<div class="hud-stat text-slate-300"><span>Enemigos:</span> <span id="count-val" class="text-white font-mono">0</span>/<span id="max-zerg-val">9</span></div>
 		
 		<div class="mt-4 pt-3 border-t border-slate-600">
-			<div class="text-[10px] text-slate-400 mb-2 uppercase tracking-wider font-semibold text-center">Misión: Sobrevivir</div>
+			<div class="text-[10px] text-slate-400 mb-2 uppercase tracking-wider font-semibold text-center">Misión: Defender el Footer</div>
 			<button onclick="location.reload()" class="w-full py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded shadow transition-colors font-bold uppercase tracking-wide">
 				Reiniciar
 			</button>
 		</div>
 	</div>
 
-	<!-- Mensaje final Centrado -->
+	<!-- Mensaje final Centrado (Desplazado hacia abajo por padding-top) -->
 	<div id="end-message">
-		<h1 class="text-4xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-6 drop-shadow-sm text-center leading-tight">Fue una buena experiencia</h1>
-		<p class="text-2xl md:text-4xl text-slate-700 font-light text-center">¡Nos vemos en COINSI 2026!</p>
+		<h1 class="text-3xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-4 drop-shadow-sm text-center leading-tight px-4">Fue una buena experiencia</h1>
+		<p class="text-xl md:text-3xl text-slate-600 font-light text-center">¡Nos vemos en COINSI 2026!</p>
 	</div>
 
 	<!-- Encabezado -->
@@ -639,10 +639,10 @@
 		renderPosters();
 
 		// =================================================
-		// === LOGICA DEL ZERG RUSH OMNI (GAME) ===
+		// === LOGICA DEL ZERG RUSH ELITE (GAME) ===
 		// =================================================
 		
-		const MAX_ZERGLINGS = 18; // Límite de población para OMNI (reducido pero dinámico)
+		const MAX_ZERGLINGS = 9; // ELITE SQUAD
 		let zerglings = [];
 		let targets = [];
 		let gameInterval;
@@ -657,8 +657,8 @@
 		let level = 1;
 		
 		// Variables de dificultad dinámica
-		let spawnRate = 400; // Rapido spawn inicial
-		let zergSpeedBase = 5; // Velocidad rápida inicial
+		let spawnRate = 300; 
+		let zergSpeedBase = 7; // Faster
 		let zergHpChance = 0;
 
 		// Footer Target Reference
@@ -680,9 +680,9 @@
 			
 			// Reiniciar variables
 			level = 1;
-			spawnRate = 400;
-			zergSpeedBase = 5;
-			zergHpChance = 0;
+			spawnRate = 300;
+			zergSpeedBase = 7;
+			zergHpChance = 0.1; // Start with chance of tanks
 			score = 0;
 			destroyed = 0;
 			zerglings.forEach(z => z.el.remove());
@@ -738,11 +738,11 @@
 			document.getElementById('level-val').textContent = level;
 
 			// Más rápidos (+1)
-			if (zergSpeedBase < 15) zergSpeedBase += 1;
+			if (zergSpeedBase < 20) zergSpeedBase += 1;
 			
-			if (spawnRate > 200) spawnRate -= 50;
+			if (spawnRate > 100) spawnRate -= 30;
 			
-			if (level > 2 && zergHpChance < 0.8) zergHpChance += 0.05;
+			if (level > 1 && zergHpChance < 0.8) zergHpChance += 0.08;
 
 			const hud = document.getElementById('zerg-hud');
 			hud.style.borderColor = '#ef4444';
@@ -766,15 +766,15 @@
 			const zerg = document.createElement('div');
 			
 			let type = Math.random() > 0.5 ? 'type-r' : 'type-y';
-			let maxHp = 1;
+			let maxHp = 3; // Base HP harder
 			let size = 20;
 
-			let baseHp = level > 5 ? 2 : 1;
+			let baseHp = level > 3 ? 4 : 3;
 
 			if (Math.random() < zergHpChance) {
 				type = 'type-tank';
-				maxHp = Math.min(6, Math.floor(level / 1.5) + 2); 
-				size = 25 + (maxHp * 3);
+				maxHp = Math.min(12, Math.floor(level) + 5); // Much tougher
+				size = 25 + (maxHp * 2);
 				zerg.style.zIndex = 10000;
 			} else {
 				maxHp = baseHp;
@@ -818,7 +818,7 @@
 				el: zerg,
 				x: startX,
 				y: startY,
-				speed: zergSpeedBase + (Math.random() * 2), 
+				speed: zergSpeedBase + (Math.random() * 3), 
 				target: null,
 				hp: maxHp,
 				maxHp: maxHp,
@@ -852,7 +852,7 @@
 				}
 			} else {
 				const currentSize = parseInt(enemyData.el.style.width);
-				const newSize = currentSize * 0.85;
+				const newSize = currentSize * 0.9;
 				enemyData.el.style.width = newSize + 'px';
 				enemyData.el.style.height = newSize + 'px';
 			}
@@ -891,7 +891,10 @@
             const totalWidth = (5 * letterSpacing) + (2 * gap); 
             
 			const startX = (screenW - totalWidth) / 2;
-			const startY = centerY - (3 * gap);
+			
+            // === POSICIONAMIENTO CLAVE: ARRIBA DEL TEXTO ===
+            // Movemos el startY mucho más arriba del centro para dejar espacio al mensaje
+            const startY = centerY - 180; 
 
             zerglings.sort(() => Math.random() - 0.5);
 
@@ -995,7 +998,6 @@
 			zerglings.forEach((enemy, index) => {
 				// Limpieza si se salen muy lejos
 				if (enemy.y > document.body.scrollHeight + 500 || enemy.y < -500 || enemy.x < -500 || enemy.x > window.innerWidth + 500) {
-					// Solo eliminar si no tienen target y están lejos
 					if(!enemy.target) {
 						enemy.el.remove();
 						zerglings.splice(index, 1);
